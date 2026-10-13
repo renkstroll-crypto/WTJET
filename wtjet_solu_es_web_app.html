@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WTJET Soluções em Informática</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --text-main: #c9d1d9;
+            --text-muted: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #238636;
+            --accent-green-hover: #2ea043;
+            --card-bg: #161b22;
+            --border-color: #30363d;
+            --error-color: #f85149;
+            --table-hover: #21262d;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Inter', sans-serif; 
+        }
+
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh; 
+            overflow-x: hidden;
+        }
+
+        .bg-slider {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background-color: var(--bg-color);
+        }
+        .bg-slide {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background-size: cover; background-position: center; 
+            opacity: 0; animation: kenburns 24s infinite;
+        }
+        .bg-slide:nth-child(1) { 
+            background-image: url('https://images.unsplash.com/photo-1587202372634-32705e3bf49c?auto=format&fit=crop&w=1920&q=80'); 
+            animation-delay: 0s; 
+        }
+        .bg-slide:nth-child(2) { 
+            background-image: url('https://images.unsplash.com/photo-1600861194942-f883de0dfe96?auto=format&fit=crop&w=1920&q=80'); 
+            animation-delay: 8s; 
+        }
+        .bg-slide:nth-child(3) { 
+            background-image: url('https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?auto=format&fit=crop&w=1920&q=80'); 
+            animation-delay: 16s; 
+        }
+        .bg-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(13, 17, 23, 0.85); z-index: -1; backdrop-filter: blur(2px);
+        }
+
+        @keyframes kenburns {
+            0% { opacity: 0; transform: scale(1); }
+            10% { opacity: 0.4; }
+            25% { opacity: 0.4; }
+            35% { opacity: 0; transform: scale(1.05); }
+            100% { opacity: 0; transform: scale(1.1); }
+        }
+        
+        header { 
+            width: 100%; padding: 25px 20px; text-align: center; 
+            border-bottom: 1px solid rgba(88, 166, 255, 0.2);
+            background: rgba(13, 17, 23, 0.6); backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .btn-gestao-top { 
+            position: absolute; top: 20px; right: 20px; background: none; border: none; 
+            color: rgba(255, 255, 255, 0.1); cursor: pointer; font-size: 1.2rem; transition: color 0.3s; z-index: 100; padding: 5px;
+        }
+        .btn-gestao-top:hover { color: var(--accent-blue); }
+
+        .container { 
+            width: 90%; max-width: 650px; margin: 40px auto; flex: 1; display: flex; flex-direction: column; justify-content: center;
+        }
+        
+        .screen { display: none; animation: fadeIn 0.4s ease-out forwards; opacity: 0; transform: translateY(15px); }
+        .screen.active { display: block; }
+        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+
+        .content-box {
+            background: rgba(22, 27, 34, 0.9); padding: 35px; border-radius: 16px;
+            border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo-container { text-align: center; margin-bottom: 25px; }
+        .logo-container img {
+            width: 180px; height: auto; max-height: 180px; border-radius: 12px;
+            object-fit: contain; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn-agendamento {
+            display: block; width: 100%; background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-green-hover) 100%);
+            color: white; padding: 22px; font-size: 1.3rem; font-weight: 700; border: none; border-radius: 12px;
+            cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 8px 20px rgba(35, 134, 54, 0.25); margin-top: 10px;
+        }
+        .btn-agendamento:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(35, 134, 54, 0.4); }
+        
+        .btn-back { 
+            background-color: transparent; color: var(--text-muted); width: 100%; padding: 15px; font-size: 1rem; 
+            font-weight: 600; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; margin-top: 25px; transition: 0.3s; 
+        }
+        .btn-back:hover { background-color: var(--table-hover); color: white; }
+
+        .btn-submit { 
+            background-color: var(--accent-blue); color: var(--bg-color); width: 100%; padding: 16px; 
+            font-size: 1.1rem; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; margin-top: 15px; transition: 0.3s; 
+        }
+        .btn-submit:hover { background-color: #79c0ff; transform: translateY(-2px); }
+
+        .form-row { display: flex; gap: 15px; }
+        .form-row .form-group { flex: 1; }
+        .form-group { margin-bottom: 22px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; color: var(--text-main); font-size: 0.9rem; font-weight: 600; }
+        .form-group input, .form-group textarea, .form-group select { 
+            width: 100%; padding: 15px; background-color: rgba(13, 17, 23, 0.8); color: white; 
+            border: 1px solid var(--border-color); border-radius: 8px; font-size: 1rem; outline: none; transition: 0.3s;
+        }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { 
+            border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15); 
+        }
+
+        .dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 25px; }
+        .card { 
+            background: rgba(13, 17, 23, 0.8); padding: 20px 15px; border-radius: 12px; text-align: center; 
+            border: 1px solid var(--border-color); border-top: 4px solid var(--accent-blue); 
+            transition: all 0.3s ease; cursor: pointer; 
+        }
+        .card:hover { transform: translateY(-5px); border-color: var(--accent-blue); background: var(--table-hover); }
+        .card h3 { color: var(--text-main); font-size: 1.1rem; margin-bottom: 8px; }
+        .card p { color: var(--text-muted); font-size: 0.85rem; }
+
+        .table-container { width: 100%; overflow-x: auto; margin-top: 15px; border-radius: 8px; border: 1px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; text-align: left; background: rgba(13, 17, 23, 0.8); }
+        th, td { padding: 15px; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+        th { background: rgba(88, 166, 255, 0.1); color: var(--accent-blue); font-weight: 600; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: var(--table-hover); }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px);
+            display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content {
+            background: var(--card-bg); border: 1px solid var(--border-color); padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center;
+            transform: scale(0.9); transition: all 0.3s ease; box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+        }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .modal-content h3 { color: white; margin-bottom: 15px; }
+        .modal-content p { color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem; }
+        .modal-content input { margin-bottom: 20px; text-align: center; font-size: 1.2rem; letter-spacing: 2px;}
+        
+        .modal-actions { display: flex; gap: 10px; }
+        .modal-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s; }
+        .modal-btn-cancel { background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color); }
+        .modal-btn-cancel:hover { background: var(--border-color); }
+        .modal-btn-confirm { background: var(--accent-blue); color: var(--bg-color); }
+        .modal-btn-confirm:hover { background: #79c0ff; }
+        .error-text { color: var(--error-color); font-size: 0.85rem; margin-top: -10px; margin-bottom: 15px; display: none; }
+        
+        footer { width: 100%; padding: 20px; text-align: center; color: rgba(255,255,255,0.2); font-size: 0.85rem; margin-top: auto; position: relative; z-index: 10; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-slider">
+        <div class="bg-slide"></div>
+        <div class="bg-slide"></div>
+        <div class="bg-slide"></div>
+    </div>
+    <div class="bg-overlay"></div>
+
+    <header>
+        <button class="btn-gestao-top" onclick="openPasswordModal()" title="Área Restrita">🔒</button>
+        <h1 style="display: none;">WTJET</h1>
+    </header>
+
+    <main class="container">
+        
+        <div id="home-screen" class="screen active">
+            <div class="logo-container">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" alt="WTJET Logo" onerror="this.src='https://placehold.co/300x120/161b22/58a6ff?text=WTJET+Logo'">
+            </div>
+
+            <p style="text-align: center; color: #fff; margin-bottom: 40px; font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                Assistência técnica especializada em Computadores, Notebooks Gamers e Impressoras.
+            </p>
+            
+            <button class="btn-agendamento" onclick="showScreen('client-screen')">AGENDAMENTO</button>
+        </div>
+
+        <div id="client-screen" class="screen">
+            <div class="content-box">
+                <h2 style="color: #fff; text-align: center; margin-bottom: 25px;">Novo Agendamento</h2>
+                
+                <div class="form-group">
+                    <label>Nome Completo (ou Empresa):</label>
+                    <input type="text" id="cli-nome" placeholder="Digite seu nome">
+                </div>
+                <div class="form-group">
+                    <label>CPF ou CNPJ:</label>
+                    <input type="text" id="cli-cpf-cnpj" placeholder="Apenas números">
+                </div>
+                <div class="form-group">
+                    <label>Selecione o Equipamento:</label>
+                    <select id="cli-equipamento">
+                        <option value="Computador / PC Desktop">Computador / PC Desktop</option>
+                        <option value="PC Gamer">PC Gamer</option>
+                        <option value="Notebook">Notebook</option>
+                        <option value="Impressora">Impressora</option>
+                        <option value="Outros">Outros</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Descrição do Problema / Serviço:</label>
+                    <textarea id="cli-defeito" rows="4" placeholder="Ex: O computador liga mas não dá imagem..."></textarea>
+                </div>
+                
+                <button class="btn-submit" onclick="enviarWhatsApp()">Enviar Solicitação via WhatsApp</button>
+                <button class="btn-back" onclick="showScreen('home-screen')">Voltar</button>
+            </div>
+        </div>
+
+        <div id="owner-screen" class="screen">
+            <div class="content-box">
+                <h2 style="color: var(--accent-blue); text-align: center;">Painel de Gestão</h2>
+                <p style="text-align: center; color: var(--text-muted); margin-bottom: 25px;">Área restrita de administração</p>
+                
+                <div class="dashboard-grid">
+                    <div class="card" onclick="showScreen('os-screen')">
+                        <h3>Nova O.S.</h3>
+                        <p>Criar ordem</p>
+                    </div>
+                    <div class="card" onclick="showScreen('clientes-screen')">
+                        <h3>Clientes</h3>
+                        <p>Base de dados</p>
+                    </div>
+                    <div class="card" onclick="openGeminiAssistant()">
+                        <h3>Assistente IA</h3>
+                        <p>Diagnóstico Gemini</p>
+                    </div>
+                    <div class="card" onclick="showCustomAlert('Aviso', 'Módulo de Caixa em desenvolvimento.')">
+                        <h3>Caixa</h3>
+                        <p>Financeiro</p>
+                    </div>
+                </div>
+                <button class="btn-back" onclick="showScreen('home-screen')">Sair do Painel</button>
+            </div>
+        </div>
+
+        <div id="os-screen" class="screen">
+            <div class="content-box">
+                <h2 style="color: var(--accent-blue); text-align: center; margin-bottom: 25px;">Abrir Nova O.S.</h2>
+                
+                <div class="form-group">
+                    <label>Selecione o Cliente:</label>
+                    <select id="os-cliente">
+                        <!-- Povoado via JavaScript -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Equipamento:</label>
+                    <input type="text" id="os-equipamento" placeholder="Ex: Notebook Dell Inspiron">
+                </div>
+                <div class="form-group">
+                    <label>Defeito Relatado:</label>
+                    <textarea id="os-defeito" rows="3" placeholder="Detalhes do problema..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Status:</label>
+                        <select id="os-status">
+                            <option value="Recebido">Recebido</option>
+                            <option value="Em Análise">Em Análise</option>
+                            <option value="Aguardando Peça">Aguardando Peça</option>
+                            <option value="Concluído">Concluído</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Valor (R$):</label>
+                        <input type="text" id="os-valor" placeholder="0,00">
+                    </div>
+                </div>
+                
+                <button class="btn-submit" onclick="salvarOS()">Salvar O.S.</button>
+                <button class="btn-back" onclick="showScreen('owner-screen')">Voltar ao Painel</button>
+            </div>
+        </div>
+
+        <div id="clientes-screen" class="screen">
+            <div class="content-box">
+                <h2 style="color: var(--accent-blue); text-align: center; margin-bottom: 10px;">Base de Clientes</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">Exibindo últimos clientes cadastrados</p>
+                    <button style="background: var(--accent-green); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.85rem;" onclick="openNovoClienteModal()">+ Novo Cliente</button>
+                </div>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>CPF/CNPJ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-clientes-body">
+                            <!-- Preenchido via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <button class="btn-back" onclick="showScreen('owner-screen')">Voltar ao Painel</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 WTJET Soluções em Informática</p>
+    </footer>
+
+    <div id="password-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Acesso Restrito</h3>
+            <p>Insira a senha de administrador.</p>
+            <input type="password" id="admin-password" class="form-group" style="width: 100%; padding: 12px; background: rgba(13,17,23,0.8); color: white; border: 1px solid var(--border-color); border-radius: 8px; outline: none;" placeholder="****">
+            <p id="password-error" class="error-text">Senha incorreta!</p>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeModal('password-modal')">Cancelar</button>
+                <button class="modal-btn modal-btn-confirm" onclick="verifyPassword()">Entrar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="alert-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="alert-title">Aviso</h3>
+            <p id="alert-message">Mensagem</p>
+            <button class="modal-btn modal-btn-confirm" style="width: 100%;" onclick="closeModal('alert-modal')">OK</button>
+        </div>
+    </div>
+
+    <!-- Modal Novo Cliente -->
+    <div id="new-client-modal" class="modal-overlay">
+        <div class="modal-content" style="text-align: left;">
+            <h3 style="text-align: center; color: var(--accent-blue); margin-bottom: 20px;">Novo Cliente</h3>
+            <div class="form-group">
+                <label>Nome Completo:</label>
+                <input type="text" id="nc-nome" placeholder="Ex: Maria Fernanda">
+            </div>
+            <div class="form-group">
+                <label>CPF ou CNPJ:</label>
+                <input type="text" id="nc-doc" placeholder="Apenas números">
+            </div>
+            <div class="modal-actions" style="margin-top: 25px;">
+                <button class="modal-btn modal-btn-cancel" onclick="closeModal('new-client-modal')">Cancelar</button>
+                <button class="modal-btn modal-btn-confirm" onclick="salvarNovoCliente()">Cadastrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal do Assistente Gemini (IA) -->
+    <div id="gemini-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 500px; text-align: left;">
+            <h3 style="color: var(--accent-blue); text-align: center; margin-bottom: 10px;">🤖 Assistente Técnico Gemini</h3>
+            <p style="text-align: center; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Peça dicas de diagnóstico para PCs, notebooks ou impressoras.</p>
+            
+            <div class="form-group">
+                <label>Descreva o sintoma do equipamento:</label>
+                <input type="text" id="gemini-prompt" placeholder="Ex: Notebook liga mas cooler dispara e não dá vídeo">
+            </div>
+            
+            <div id="gemini-loading" style="display: none; text-align: center; color: var(--accent-blue); margin-bottom: 15px; font-weight: 600;">
+                Consultando inteligência artificial...
+            </div>
+
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>Diagnóstico / Solução sugerida:</label>
+                <textarea id="gemini-result" rows="5" readonly placeholder="A resposta da IA aparecerá aqui..." style="background: rgba(13,17,23,0.9); font-size: 0.85rem;"></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeModal('gemini-modal')">Fechar</button>
+                <button class="modal-btn modal-btn-confirm" onclick="consultarGeminiAI()">Perguntar à IA</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let clientesCadastrados = [
+            { id: 1, nome: "Carlos Eduardo", doc: "111.222.333-44" },
+            { id: 2, nome: "Tech Solutions LTDA", doc: "12.345.678/0001-90" }
+        ];
+
+        window.onload = function() {
+            renderTabelaClientes();
+            renderSelectClientesOS();
+        };
+
+        window.renderTabelaClientes = function() {
+            const tbody = document.getElementById('tabela-clientes-body');
+            tbody.innerHTML = '';
+            clientesCadastrados.forEach(cliente => {
+                tbody.innerHTML += `<tr>
+                    <td>${cliente.nome}</td>
+                    <td>${cliente.doc}</td>
+                </tr>`;
+            });
+        }
+
+        window.renderSelectClientesOS = function() {
+            const select = document.getElementById('os-cliente');
+            select.innerHTML = '<option value="">-- Selecione o Cliente --</option>';
+            clientesCadastrados.forEach(cliente => {
+                select.innerHTML += `<option value="${cliente.nome}">${cliente.nome}</option>`;
+            });
+        }
+
+        window.openNovoClienteModal = function() {
+            document.getElementById('new-client-modal').classList.add('active');
+            setTimeout(() => document.getElementById('nc-nome').focus(), 100);
+        }
+
+        window.salvarNovoCliente = function() {
+            const nome = document.getElementById('nc-nome').value.trim();
+            const doc = document.getElementById('nc-doc').value.trim();
+
+            if(!nome) {
+                showCustomAlert("Atenção", "O nome do cliente é obrigatório.");
+                return;
+            }
+
+            const novoId = clientesCadastrados.length > 0 ? clientesCadastrados[clientesCadastrados.length - 1].id + 1 : 1;
+            clientesCadastrados.push({ id: novoId, nome: nome, doc: doc || "Não informado" });
+
+            document.getElementById('nc-nome').value = '';
+            document.getElementById('nc-doc').value = '';
+
+            closeModal('new-client-modal');
+            renderTabelaClientes();
+            renderSelectClientesOS();
+            showCustomAlert("Sucesso", "Novo cliente cadastrado! Disponível para O.S.");
+        }
+
+        window.showScreen = function(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.showCustomAlert = function(title, message) {
+            document.getElementById('alert-title').innerText = title;
+            document.getElementById('alert-message').innerText = message;
+            document.getElementById('alert-modal').classList.add('active');
+        }
+
+        window.closeModal = function(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            if (modalId === 'password-modal') {
+                document.getElementById('admin-password').value = '';
+                document.getElementById('password-error').style.display = 'none';
+            }
+        }
+
+        window.openPasswordModal = function() {
+            document.getElementById('password-modal').classList.add('active');
+            setTimeout(() => document.getElementById('admin-password').focus(), 100);
+        }
+
+        window.verifyPassword = function() {
+            const pwd = document.getElementById('admin-password').value;
+            if (pwd === "1234") {
+                closeModal('password-modal');
+                showScreen('owner-screen');
+            } else {
+                document.getElementById('password-error').style.display = 'block';
+                document.getElementById('admin-password').value = '';
+                document.getElementById('admin-password').focus();
+            }
+        }
+
+        document.getElementById('admin-password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') verifyPassword();
+        });
+
+        window.enviarWhatsApp = function() {
+            const numeroWhatsApp = "5599900000000";
+            const nome = document.getElementById("cli-nome").value.trim();
+            const documento = document.getElementById("cli-cpf-cnpj").value.trim();
+            const equipamento = document.getElementById("cli-equipamento").value;
+            const defeito = document.getElementById("cli-defeito").value.trim();
+
+            if(!nome || !defeito) {
+                showCustomAlert("Atenção", "Preencha o nome e descreva o problema para agendar.");
+                return;
+            }
+
+            const docFormatado = documento ? documento : 'Não informado';
+            const mensagem = `*NOVO AGENDAMENTO - WTJET*%0A%0A*Cliente:* ${nome}%0A*CPF/CNPJ:* ${docFormatado}%0A*Equipamento:* ${equipamento}%0A*Problema/Serviço:* ${defeito}`;
+            
+            window.open(`https://wa.me/${numeroWhatsApp}?text=${mensagem}`, '_blank');
+            
+            document.getElementById("cli-nome").value = '';
+            document.getElementById("cli-cpf-cnpj").value = '';
+            document.getElementById("cli-equipamento").value = 'Computador / PC Desktop';
+            document.getElementById("cli-defeito").value = '';
+            
+            showScreen('home-screen');
+        }
+
+        window.salvarOS = function() {
+            const cliente = document.getElementById("os-cliente").value;
+            const equipamento = document.getElementById("os-equipamento").value.trim();
+            const defeito = document.getElementById("os-defeito").value.trim();
+            
+            if(!cliente || !equipamento || !defeito) {
+                showCustomAlert("Atenção", "Selecione o Cliente, Equipamento e Defeito para salvar.");
+                return;
+            }
+            
+            showCustomAlert("Sucesso!", `A Ordem de Serviço para "${cliente}" foi registrada.`);
+            
+            document.getElementById("os-cliente").value = '';
+            document.getElementById("os-equipamento").value = '';
+            document.getElementById("os-defeito").value = '';
+            document.getElementById("os-valor").value = '';
+            document.getElementById("os-status").value = 'Recebido';
+
+            showScreen('owner-screen');
+        }
+
+        // --- GEMINI API INTEGRATION ---
+        window.openGeminiAssistant = function() {
+            document.getElementById('gemini-modal').classList.add('active');
+            document.getElementById('gemini-prompt').value = '';
+            document.getElementById('gemini-result').value = '';
+        }
+
+        window.consultarGeminiAI = async function() {
+            const promptText = document.getElementById('gemini-prompt').value.trim();
+            const resultArea = document.getElementById('gemini-result');
+            const loadingIndicator = document.getElementById('gemini-loading');
+
+            if (!promptText) {
+                showCustomAlert("Atenção", "Digite o sintoma do equipamento para consultar a IA.");
+                return;
+            }
+
+            loadingIndicator.style.display = 'block';
+            resultArea.value = '';
+
+            const systemPrompt = "Você é um especialista sênior em suporte técnico de informática (computadores, notebooks gamers e impressoras). Forneça um diagnóstico direto e objetivo com prováveis causas e passos de solução em português.";
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: promptText }] }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                }
+            };
+
+            let success = false;
+            let attempts = 0;
+            let delay = 1000;
+
+            while (!success && attempts < 4) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (!response.ok) throw new Error('Erro na requisição');
+                    
+                    const result = await response.json();
+                    const candidate = result.candidates?.[0];
+
+                    if (candidate && candidate.content?.parts?.[0]?.text) {
+                        resultArea.value = candidate.content.parts[0].text;
+                        success = true;
+                    } else {
+                        resultArea.value = "Não foi possível obter um diagnóstico neste momento.";
+                        success = true;
+                    }
+                } catch (error) {
+                    attempts++;
+                    if (attempts >= 4) {
+                        resultArea.value = "Erro ao conectar com a API do Gemini. Verifique sua conexão.";
+                    } else {
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2;
+                    }
+                }
+            }
+            loadingIndicator.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
